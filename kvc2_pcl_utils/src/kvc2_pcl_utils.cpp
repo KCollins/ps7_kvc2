@@ -278,23 +278,6 @@ void kvc2PclUtils::example_pcl_operation() {
     }    
 } 
 
-void kvc2PclUtils::coplanar() {
-    Eigen::Vector3f centroid;
-    centroid = compute_centroid(pclTransformedSelectedPoints_ptr_);
-
-    int npts = pclTransformed_ptr_->points.size();
-    ROS_INFO_STREAM("There are " << npts << " points.\n");
-
-    pclGenPurposeCloud_ptr_->points.resize(npts);
-
-    pclGenPurposeCloud_ptr_->points.clear();
-
-    for(int i = 0; i < npts; ++i){
-        if(((centroid[2] - 0.05) < (pclTransformed_ptr_->points[i].getVector3fMap()[2])) && ((pclTransformed_ptr_->points[i].getVector3fMap()[2]) < (centroid[2] + 0.05))) {
-            pclGenPurposeCloud_ptr_->points.push_back(pclTransformed_ptr_->points[i]);
-         }   
-    } 
-}
 //This fnc populates and output cloud of type XYZRGB extracted from the full Kinect cloud (in Kinect frame)
 // provide a vector of indices and a holder for the output cloud, which gets populated
 void kvc2PclUtils::copy_indexed_pts_to_output_cloud(vector<int> &indices,PointCloud<pcl::PointXYZRGB> &outputCloud) {
@@ -619,4 +602,23 @@ void kvc2PclUtils::selectCB(const sensor_msgs::PointCloud2ConstPtr& cloud) {
     ROS_INFO("done w/ selected-points callback");
 
     got_selected_points_ = true;
+}
+
+
+void kvc2PclUtils::coplanar() {
+    Eigen::Vector3f centroid;
+    centroid = compute_centroid(pclTransformedSelectedPoints_ptr_);
+
+    int npts = pclTransformed_ptr_->points.size();
+    ROS_INFO_STREAM("There are " << npts << " points.\n");
+
+    pclGenPurposeCloud_ptr_->points.resize(npts);
+
+    pclGenPurposeCloud_ptr_->points.clear();
+
+    for(int i = 0; i < npts; ++i){
+        if(((centroid[2] - 0.025) < (pclTransformed_ptr_->points[i].getVector3fMap()[2])) && ((pclTransformed_ptr_->points[i].getVector3fMap()[2]) < (centroid[2] + 0.05))) {
+            pclGenPurposeCloud_ptr_->points.push_back(pclTransformed_ptr_->points[i]);
+         }   
+    } 
 }

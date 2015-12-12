@@ -4,7 +4,7 @@ Modified version of cwru_pcl_utils; ps7_kvc2.cpp is derived from cwru_pcl_utils_
 
 ## Example usage
 In separate terminals, run:
--roslaunch cwru_baxter_sim baxter_world.launch (Wait for "Gravity compensation was turned off" message)
+-roslaunch cwru_baxter_sim baxter_world.launch
 -roslaunch cwru_baxter_sim kinect_xform.launch
 -rosrun ps7_kvc2 ps7_kvc2
 -rosrun rviz rviz
