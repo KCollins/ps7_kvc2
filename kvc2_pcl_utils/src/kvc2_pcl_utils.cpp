@@ -607,18 +607,13 @@ void kvc2PclUtils::selectCB(const sensor_msgs::PointCloud2ConstPtr& cloud) {
 
 void kvc2PclUtils::coplanar() {
     Eigen::Vector3f centroid;
-    centroid = compute_centroid(pclTransformedSelectedPoints_ptr_);
-
-    int npts = pclTransformed_ptr_->points.size();
-    ROS_INFO_STREAM("There are " << npts << " points.\n");
-
-    pclGenPurposeCloud_ptr_->points.resize(npts);
-
+    centroid = compute_centroid(pclTransformedSelectedPoints_ptr_); //finds centroid of selected points
+    int npts = pclTransformed_ptr_->points.size(); // number of points selected
+    pclGenPurposeCloud_ptr_->points.resize(npts); 
     pclGenPurposeCloud_ptr_->points.clear();
-
-    for(int i = 0; i < npts; ++i){
-        if(((centroid[2] - 0.025) < (pclTransformed_ptr_->points[i].getVector3fMap()[2])) && ((pclTransformed_ptr_->points[i].getVector3fMap()[2]) < (centroid[2] + 0.05))) {
-            pclGenPurposeCloud_ptr_->points.push_back(pclTransformed_ptr_->points[i]);
+    for(int i = 0; i < npts; ++i){ // steps thru pointcloud and finds points with Z data within tolerance of .005 from centroid
+        if(((centroid[2] - 0.005) < (pclTransformed_ptr_->points[i].getVector3fMap()[2])) && ((pclTransformed_ptr_->points[i].getVector3fMap()[2]) < (centroid[2] + 0.05))) {
+            pclGenPurposeCloud_ptr_->points.push_back(pclTransformed_ptr_->points[i]); // saves points within tolerance to pclGenPurposeCloud
          }   
     } 
 }
