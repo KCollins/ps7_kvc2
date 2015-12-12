@@ -5,8 +5,8 @@ find_package(catkin_simple REQUIRED)
 find_package(cmake_modules REQUIRED)
 find_package(Eigen3 REQUIRED)
 find_package(PCL 1.7 REQUIRED)
-include_directories(${EIGEN3_INCLUDE_DIR})
-add_definitions(${EIGEN_DEFINITIONS})
+#include_directories(${EIGEN3_INCLUDE_DIR})
+#add_definitions(${EIGEN_DEFINITIONS})
 
 catkin_simple()
 

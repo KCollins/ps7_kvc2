@@ -21,9 +21,9 @@ int main(int argc, char** argv) {
         ros::Duration(1.0).sleep();
     }
     ROS_INFO("got a pointcloud");
-    //ROS_INFO("saving pointcloud");
-    //kvc2_pcl_utils.save_kinect_snapshot();
-    //kvc2_pcl_utils.save_kinect_clr_snapshot();  // save color version of pointcloud as well
+    ROS_INFO("saving pointcloud");
+    kvc2_pcl_utils.save_kinect_snapshot();
+    kvc2_pcl_utils.save_kinect_clr_snapshot();  // save color version of pointcloud as well
 
     //set up a publisher to display clouds in rviz:
     ros::Publisher pubCloud = nh.advertise<sensor_msgs::PointCloud2> ("/pcl_cloud_display", 1);
@@ -93,6 +93,7 @@ int main(int argc, char** argv) {
             //ROS_INFO("getting indices of coplanar points within radius %f of patch centroid",radius);
             //kvc2_pcl_utils.filter_cloud_z(plane_dist, z_eps, radius,centroid,selected_indices);
             kvc2_pcl_utils.coplanar();
+            kvc2_pcl_utils.get_gen_purpose_cloud(display_cloud);
 
             //copy indexed points from Kinect color pointer to display cloud, also in color
             // This provides a circle of points on plane of selected points
@@ -131,19 +132,20 @@ int main(int argc, char** argv) {
             // from the original pointcloud (in Kinect sensor frame)
             //kvc2_pcl_utils.copy_indexed_pts_to_output_cloud(selected_indices_colormatch,display_color_cloud);
             
-            kvc2_pcl_utils.reset_got_selected_points();   // reset the selected-points trigger
+            //kvc2_pcl_utils.reset_got_selected_points();   // reset the selected-points trigger
         }
 
         // display (publish) the color cloud extracted from color Kinect cloud
-        pcl::toROSMsg(display_color_cloud, pcl2_display_cloud); //convert datatype to compatible ROS message type for publication
+        pcl::toROSMsg(display_cloud, pcl2_display_cloud); //convert datatype to compatible ROS message type for publication
         pcl2_display_cloud.header.stamp = ros::Time::now(); //update the time stamp, so rviz does not complain        
+        pcl2_display_cloud.header.frame_id="torso";
         pubCloud.publish(pcl2_display_cloud); //publish a point cloud that can be viewed in rviz (under topic pcl_cloud_display)
 
         ros::Duration(0.5).sleep(); // sleep for half a second
         ros::spinOnce();
     }
     ROS_INFO("my work here is done!");
-
+    return 0;
 }
 
 

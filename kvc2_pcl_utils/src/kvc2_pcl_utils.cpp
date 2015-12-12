@@ -25,7 +25,7 @@ void kvc2PclUtils::fit_points_to_plane(Eigen::MatrixXf points_mat, Eigen::Vector
     int npts = points_mat.cols(); // number of points = number of columns in matrix; check the size
     
     // first compute the centroid of the data:
-    //Eigen::Vector3f centroid; // make this member var, centroid_
+    Eigen::Vector3f centroid; // make this member var, centroid_
     centroid_ = Eigen::MatrixXf::Zero(3, 1); // see http://eigen.tuxfamily.org/dox/AsciiQuickReference.txt
     
     //centroid = compute_centroid(points_mat);
@@ -33,7 +33,7 @@ void kvc2PclUtils::fit_points_to_plane(Eigen::MatrixXf points_mat, Eigen::Vector
         centroid_ += points_mat.col(ipt); //add all the column vectors together
     }
     centroid_ /= npts; //divide by the number of points to get the centroid    
-    cout<<"centroid: "<<centroid_.transpose()<<endl;
+    //cout<<"centroid: "<<centroid_.transpose()<<endl;
 
 
     // subtract this centroid from all points in points_mat:
@@ -71,8 +71,8 @@ void kvc2PclUtils::fit_points_to_plane(Eigen::MatrixXf points_mat, Eigen::Vector
     // however, the solution does not order the evals, so we'll have to find the one of interest ourselves
 
     double min_lambda = evals[0]; //initialize the hunt for min eval
-    double max_lambda = evals[0]; // and for max eval
-    //Eigen::Vector3cf complex_vec; // here is a 3x1 vector of double-precision, complex numbers
+    //double max_lambda = evals[0]; // and for max eval
+    Eigen::Vector3cf complex_vec; // here is a 3x1 vector of double-precision, complex numbers
     //Eigen::Vector3f evec0, evec1, evec2; //, major_axis; 
     //evec0 = es3f.eigenvectors().col(0).real();
     //evec1 = es3f.eigenvectors().col(1).real();
@@ -86,18 +86,18 @@ void kvc2PclUtils::fit_points_to_plane(Eigen::MatrixXf points_mat, Eigen::Vector
     
     //sort the evals:
     
-    //complex_vec = es3f.eigenvectors().col(0); // here's the first e-vec, corresponding to first e-val
+    complex_vec = es3f.eigenvectors().col(0); // here's the first e-vec, corresponding to first e-val
     //cout<<"complex_vec: "<<endl;
     //cout<<complex_vec<<endl;
     plane_normal = es3f.eigenvectors().col(0).real(); //complex_vec.real(); //strip off the real part
-    major_axis_ = es3f.eigenvectors().col(0).real(); // starting assumptions
+    //major_axis_ = es3f.eigenvectors().col(0).real(); // starting assumptions
     
     //cout<<"real part: "<<est_plane_normal.transpose()<<endl;
     //est_plane_normal = es3d.eigenvectors().col(0).real(); // evecs in columns
 
     double lambda_test;
     int i_normal = 0;
-    int i_major_axis=0;
+    //int i_major_axis=0;
     //loop through "all" ("both", in this 3-D case) the rest of the solns, seeking min e-val
     for (int ivec = 1; ivec < 3; ivec++) {
         lambda_test = evals[ivec];
@@ -106,19 +106,19 @@ void kvc2PclUtils::fit_points_to_plane(Eigen::MatrixXf points_mat, Eigen::Vector
             i_normal = ivec; //this index is closer to index of min eval
             plane_normal = es3f.eigenvectors().col(i_normal).real();
         }
-        if (lambda_test > max_lambda) {
-            max_lambda = lambda_test;
-            i_major_axis = ivec; //this index is closer to index of min eval
-            major_axis_ = es3f.eigenvectors().col(i_major_axis).real();
-        }        
+        //if (lambda_test > max_lambda) {
+            //max_lambda = lambda_test;
+            //i_major_axis = ivec; //this index is closer to index of min eval
+            //major_axis_ = es3f.eigenvectors().col(i_major_axis).real();
+        //}        
     }
     // at this point, we have the minimum eval in "min_lambda", and the plane normal
     // (corresponding evec) in "est_plane_normal"/
     // these correspond to the ith entry of i_normal
-    cout<<"min eval is "<<min_lambda<<", corresponding to component "<<i_normal<<endl;
-    cout<<"corresponding evec (est plane normal): "<<plane_normal.transpose()<<endl;
-    cout<<"max eval is "<<max_lambda<<", corresponding to component "<<i_major_axis<<endl;
-    cout<<"corresponding evec (est major axis): "<<major_axis_.transpose()<<endl;    
+    //cout<<"min eval is "<<min_lambda<<", corresponding to component "<<i_normal<<endl;
+    //cout<<"corresponding evec (est plane normal): "<<plane_normal.transpose()<<endl;
+    //cout<<"max eval is "<<max_lambda<<", corresponding to component "<<i_major_axis<<endl;
+    //cout<<"corresponding evec (est major axis): "<<major_axis_.transpose()<<endl;    
     
     //cout<<"correct answer is: "<<normal_vec.transpose()<<endl;
     plane_dist = plane_normal.dot(centroid_);
@@ -168,11 +168,11 @@ Eigen::Vector3f  kvc2PclUtils::compute_centroid(pcl::PointCloud<pcl::PointXYZ>::
 
 void kvc2PclUtils::fit_xformed_selected_pts_to_plane(Eigen::Vector3f &plane_normal, double &plane_dist) {
     fit_points_to_plane(pclTransformedSelectedPoints_ptr_, plane_normal, plane_dist);
-    //Eigen::Vector3f centroid;
+    Eigen::Vector3f centroid;
     cwru_msgs::PatchParams patch_params_msg;
     //compute the centroid; this is redundant w/ computation inside fit_points...oh well.
     // now the centroid computed by plane fit is stored in centroid_ member var
-    //centroid = compute_centroid(pclTransformedSelectedPoints_ptr_);
+    centroid = compute_centroid(pclTransformedSelectedPoints_ptr_);
 
     patch_params_msg.offset = plane_dist;
     patch_params_msg.centroid.resize(3);
@@ -575,9 +575,9 @@ void kvc2PclUtils::kinectCB(const sensor_msgs::PointCloud2ConstPtr& cloud) {
         ROS_INFO("kinectCB: got cloud with %d * %d points", (int) pclKinect_ptr_->width, (int) pclKinect_ptr_->height);
         got_kinect_cloud_ = true; //cue to "main" that callback received and saved a pointcloud 
         //check some colors:
-   int npts_clr = pclKinect_clr_ptr_->points.size();
-    cout<<"Kinect color pts size = "<<npts_clr<<endl;
-    avg_color_ = find_avg_color();
+   //int npts_clr = pclKinect_clr_ptr_->points.size();
+    //cout<<"Kinect color pts size = "<<npts_clr<<endl;
+    //avg_color_ = find_avg_color();
     /*
      for (size_t i = 0; i < pclKinect_clr_ptr_->points.size (); ++i)
      std::cout << " " << (int) pclKinect_clr_ptr_->points[i].r

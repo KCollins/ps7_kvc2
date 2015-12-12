@@ -7,7 +7,7 @@
 #ifndef KVC2_PCL_UTILS_H_
 #define KVC2_PCL_UTILS_H_
 
-#include<ros/ros.h> //generic C++ stuff
+#include <ros/ros.h> //generic C++ stuff
 #include <stdlib.h>
 #include <math.h>
 #include <iostream>
